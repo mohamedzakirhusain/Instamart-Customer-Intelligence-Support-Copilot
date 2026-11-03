@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instamart Copilot</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<aside id="side" aria-label="Tools and history">
+  <div class="brand"><div class="logo">IC</div><div><b>Instamart Copilot</b><small>Customer Intelligence</small></div></div>
+  <div class="toprow">
+    <button class="newchat" id="newchat" title="Start a new chat (Ctrl+K)">+ New chat</button>
+    <button class="icon" id="theme" title="Switch light / dark theme" aria-label="Switch theme">☾</button>
+  </div>
+  <div class="side-title">Tools</div>
+  <div id="tools"></div>
+  <div class="side-title"><span>Recent</span><button class="linkbtn" id="export" title="Download this chat as a text file">export</button></div>
+  <div id="recent"></div>
+  <div class="keys"><kbd>/</kbd> focus input · <kbd>↑</kbd><kbd>↓</kbd> earlier messages<br><kbd>Esc</kbd> clear · <kbd>Ctrl</kbd>+<kbd>K</kbd> new chat</div>
+  <div class="note">All data is synthetic. The language model is an offline mock: no network, no API key.
+    Refunds made here go to interactive_runs/, not to the graded outputs.</div>
+</aside>
+<div class="backdrop" id="backdrop"></div>
+<section>
+  <button class="menu" id="menu" aria-label="Open menu">☰</button>
+  <div id="chat"><div class="wrap" id="log" role="log" aria-live="polite" aria-label="Conversation"></div></div>
+  <button class="jump" id="jump" aria-label="Jump to the latest message" title="Jump to the latest message">↓</button>
+  <div class="composer"><div class="wrap">
+    <div class="modes" id="modes" role="group" aria-label="Tool selection"></div>
+    <div class="box"><textarea id="input" rows="1" aria-label="Type your message" placeholder="Type here and press Enter…"></textarea>
+      <button class="send" id="send" title="Send" aria-label="Send">➤</button></div>
+    <div class="hint">Enter to send · Shift+Enter for a new line</div>
+  </div></div>
+</section>
+<div class="toast" id="toast" role="status"></div>
+<script src="/app.js"></script>
+</body>
+</html>
