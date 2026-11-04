@@ -16,7 +16,8 @@ Project layout:
 | Path | Purpose |
 |---|---|
 | `run_project.py` | runs every step below in order with one command |
-| `app.py`, `web/` (`index.html`, `style.css`, `app.js`) | optional local web UI (`python app.py`, then open http://127.0.0.1:8000): a chat-style page (messages and answers scroll above, the input box stays at the bottom) with the same five tools as `ask.py`; "Auto" mode picks the tool from your message. Standard library only. Run it after `run_project.py` |
+| `app.py`, `web/` (`index.html`, `style.css`, `app.js`, `dash.js`) | optional local web UI (`python app.py`, then open http://127.0.0.1:8000). Dark and light themes. Pages: Overview (revenue, cities, heatmap), Customers (segments, PCA map, K-means table, lookup, retention list), Support triage (routing, confusion matrix, searchable redacted tickets), Refund agent (scenario results with tool steps, ledger), Quality checks (live re-verification) and the Copilot chat with the five tools of `ask.py`. Shortcuts: `g` then `o/c/t/a/q/m` to switch pages. Standard library server, charts are plain SVG (no libraries, offline). Run it after `run_project.py` |
+| `src/checks.py`, `tests/` | independent test suite: re-derives 115 reference checkpoints from the generated files (Parts A to D plus repository rules). `python tests/run_checks.py` or `python -m unittest tests.test_checkpoints -v`. Run it after `run_project.py` |
 | `ask.py` | optional interactive menu (`python ask.py`): redact a ticket, classify it, ask a policy question, request a refund, look up customer segments. Refunds made here go to `interactive_runs/` (git-ignored), not to the graded outputs |
 | `src/` | reusable functions: `cleaning.py` (Part A rules), `features.py` and `modeling.py` (Part B), `triage.py` (Part C), `rag.py` and `agent.py` (Part D) |
 | `part_a/` to `part_d/` | the runnable scripts of each Part; they import their logic from `src/` and print and save the results |

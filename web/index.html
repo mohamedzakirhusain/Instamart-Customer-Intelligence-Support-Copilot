@@ -3,37 +3,102 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
 <title>Instamart Copilot</title>
+<script>/* apply the saved theme before first paint so the intro never flashes the wrong colours */
+try { var t = JSON.parse(localStorage.getItem("ic.theme")); if (t !== "dark" && t !== "light") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"; document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-<aside id="side" aria-label="Tools and history">
-  <div class="brand"><div class="logo">IC</div><div><b>Instamart Copilot</b><small>Customer Intelligence</small></div></div>
-  <div class="toprow">
-    <button class="newchat" id="newchat" title="Start a new chat (Ctrl+K)">+ New chat</button>
-    <button class="icon" id="theme" title="Switch light / dark theme" aria-label="Switch theme">☾</button>
+<body class="booting">
+
+<!-- ============ Intro: animated logo, shown on every page load, then the Overview ============ -->
+<div id="splash" role="status" aria-live="polite" aria-label="Loading Instamart Copilot">
+  <div class="sp-aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="sp-grid" aria-hidden="true"></div>
+  <div class="sp-stage">
+    <div class="sp-mark">
+      <div class="sp-rings" aria-hidden="true"><b></b><b></b><b></b></div>
+      <div class="sp-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+      <svg class="sp-logo" viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <linearGradient id="spg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9a3c"/><stop offset=".55" stop-color="#fc6a19"/><stop offset="1" stop-color="#ff3d6e"/></linearGradient>
+          <linearGradient id="sps" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+          <linearGradient id="spt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
+          <clipPath id="spc"><rect x="10" y="10" width="100" height="100" rx="28"/></clipPath>
+        </defs>
+        <rect x="10" y="10" width="100" height="100" rx="28" fill="url(#spg)"/>
+        <rect x="10" y="10" width="100" height="50" rx="28" fill="url(#spt)"/>
+        <g clip-path="url(#spc)"><polygon class="sp-shine" points="0,0 30,0 6,120 -24,120" fill="url(#sps)"/></g>
+        <path class="sp-i" pathLength="1" d="M40 42 V78"/>
+        <path class="sp-c" pathLength="1" d="M88 46 A20 20 0 1 0 88 74"/>
+      </svg>
+    </div>
+    <h1 class="sp-word" aria-label="Instamart Copilot">
+      <span style="--i:0">I</span><span style="--i:1">n</span><span style="--i:2">s</span><span style="--i:3">t</span><span style="--i:4">a</span><span style="--i:5">m</span><span style="--i:6">a</span><span style="--i:7">r</span><span style="--i:8">t</span>
+      <em class="sp-gap"></em>
+      <span class="hot" style="--i:9">C</span><span class="hot" style="--i:10">o</span><span class="hot" style="--i:11">p</span><span class="hot" style="--i:12">i</span><span class="hot" style="--i:13">l</span><span class="hot" style="--i:14">o</span><span class="hot" style="--i:15">t</span>
+    </h1>
+    <p class="sp-tag">Customer Intelligence &amp; Support Copilot</p>
+    <div class="sp-bar" aria-hidden="true"><i></i></div>
+    <div class="sp-status" id="spstatus">Warming up the models…</div>
   </div>
-  <div class="side-title">Tools</div>
-  <div id="tools"></div>
-  <div class="side-title"><span>Recent</span><button class="linkbtn" id="export" title="Download this chat as a text file">export</button></div>
-  <div id="recent"></div>
-  <div class="keys"><kbd>/</kbd> focus input · <kbd>↑</kbd><kbd>↓</kbd> earlier messages<br><kbd>Esc</kbd> clear · <kbd>Ctrl</kbd>+<kbd>K</kbd> new chat</div>
+  <button class="sp-skip" id="spskip" type="button">Skip intro</button>
+</div>
+
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<a class="skip" href="#main">Skip to content</a>
+<aside id="side" aria-label="Navigation">
+  <div class="brand"><div class="logo">IC</div><div><b>Instamart Copilot</b><small>Customer Intelligence</small></div></div>
+  <nav id="nav" aria-label="Sections"></nav>
+  <div id="chatside">
+    <div class="toprow"><button class="newchat" id="newchat" title="Start a new chat (Ctrl+K)">+ New chat</button></div>
+    <div class="side-title">Tools</div>
+    <div id="tools"></div>
+    <div class="side-title"><span>Recent</span><button class="linkbtn" id="export" title="Download this chat as a text file">export</button></div>
+    <div id="recent"></div>
+    <div class="keys"><kbd>/</kbd> focus input · <kbd>↑</kbd><kbd>↓</kbd> earlier messages<br><kbd>Esc</kbd> clear · <kbd>Ctrl</kbd>+<kbd>K</kbd> new chat</div>
+  </div>
   <div class="note">All data is synthetic. The language model is an offline mock: no network, no API key.
     Refunds made here go to interactive_runs/, not to the graded outputs.</div>
 </aside>
 <div class="backdrop" id="backdrop"></div>
-<section>
-  <button class="menu" id="menu" aria-label="Open menu">☰</button>
-  <div id="chat"><div class="wrap" id="log" role="log" aria-live="polite" aria-label="Conversation"></div></div>
-  <button class="jump" id="jump" aria-label="Jump to the latest message" title="Jump to the latest message">↓</button>
-  <div class="composer"><div class="wrap">
-    <div class="modes" id="modes" role="group" aria-label="Tool selection"></div>
-    <div class="box"><textarea id="input" rows="1" aria-label="Type your message" placeholder="Type here and press Enter…"></textarea>
-      <button class="send" id="send" title="Send" aria-label="Send">➤</button></div>
-    <div class="hint">Enter to send · Shift+Enter for a new line</div>
-  </div></div>
-</section>
+
+<div class="stage">
+  <header class="topbar">
+    <button class="menu" id="menu" aria-label="Open menu">☰</button>
+    <div class="crumbs"><h1 id="title">Overview</h1><span id="subtitle" class="muted"></span></div>
+    <span class="spacer"></span>
+    <span class="status" title="Everything runs locally"><i></i>Offline · synthetic data</span>
+    <button class="themebtn" id="theme" title="Switch light / dark theme" aria-label="Switch theme">
+      <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+    </button>
+  </header>
+
+  <main id="main">
+    <section class="view dash" id="view-overview" hidden></section>
+    <section class="view dash" id="view-customers" hidden></section>
+    <section class="view dash" id="view-triage" hidden></section>
+    <section class="view dash" id="view-agent" hidden></section>
+    <section class="view dash" id="view-quality" hidden></section>
+
+    <section class="view chatview" id="view-chat" hidden>
+      <div id="chat"><div class="wrap" id="log" role="log" aria-live="polite" aria-label="Conversation"></div></div>
+      <button class="jump" id="jump" aria-label="Jump to the latest message" title="Jump to the latest message">↓</button>
+      <div class="composer"><div class="wrap">
+        <div class="modes" id="modes" role="group" aria-label="Tool selection"></div>
+        <div class="box"><textarea id="input" rows="1" aria-label="Type your message" placeholder="Type here and press Enter…"></textarea>
+          <button class="send" id="send" title="Send" aria-label="Send">➤</button></div>
+        <div class="hint">Enter to send · Shift+Enter for a new line</div>
+      </div></div>
+    </section>
+  </main>
+</div>
 <div class="toast" id="toast" role="status"></div>
 <script src="/app.js"></script>
+<script src="/fx.js"></script>
+<script src="/dash.js"></script>
 </body>
 </html>

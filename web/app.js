@@ -73,7 +73,11 @@ async function copyText(text) {
   try { document.execCommand("copy"); toast("Copied"); } catch (e) { toast("Copy not available in this browser"); }
   ta.remove();
 }
-function applyTheme(t) { document.documentElement.dataset.theme = t; $("theme").textContent = t === "dark" ? "☾" : "☀"; store.set("ic.theme", t); }
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t; store.set("ic.theme", t);
+  $("theme").setAttribute("aria-label", t === "dark" ? "Switch to light theme" : "Switch to dark theme");
+  document.dispatchEvent(new CustomEvent("themechange", { detail: t }));
+}
 
 // ---- sidebar, modes -----------------------------------------------------------------------------
 function buildSide() {

@@ -41,10 +41,20 @@ class Handler(BaseHTTPRequestHandler):
         if url.path in ("/", "/index.html"):
             with open(os.path.join(ROOT, "web", "index.html"), "rb") as f:
                 return self._send(200, f.read(), "text/html")
-        static = {"/style.css": "text/css", "/app.js": "text/javascript"}      # only these two files are served
+        static = {"/style.css": "text/css", "/app.js": "text/javascript",
+                  "/dash.js": "text/javascript", "/fx.js": "text/javascript"}                               # only these files are served
         if url.path in static:
             with open(os.path.join(ROOT, "web", url.path.lstrip("/")), "rb") as f:
                 return self._send(200, f.read(), static[url.path])
+        if url.path in ("/api/dashboard", "/api/checks"):
+            try:
+                fresh = parse_qs(url.query).get("refresh", ["0"])[0] == "1"
+                fn = S.dashboard if url.path == "/api/dashboard" else S.checks
+                return self._send(200, fn(fresh))
+            except FileNotFoundError:
+                return self._send(500, {"error": "Data files are missing. Run `python run_project.py` first."})
+            except Exception as exc:
+                return self._send(500, {"error": f"{type(exc).__name__}: {exc}"})
         if url.path == "/api/segments":
             try:
                 q = parse_qs(url.query)
