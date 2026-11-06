@@ -260,7 +260,7 @@ The zero-shot prompt (37 estimated tokens) contains CLASSIFY, lists billing, del
 
 ### Retries
 
-Every model call is wrapped in a retry function: maximum 3 retries, wait before retry n = `0.05 x 2**n x random.uniform(0.9, 1.15)` seconds, one log line per retry (ticket id, retry number, wait) written to `outputs/retry_log.txt` (it accumulates all four runs). In a full run over the 156 eligible tickets there were exactly 19 `TransientLLMError`s and all 19 were recovered by the first retry (every retry is retry number 0, with waits between 0.0458 and 0.0573 seconds, inside 0.045 to 0.0575). No ticket ended with a permanent error.
+Every model call is wrapped in a retry function: maximum 3 retries, wait before retry n = `0.05 x 2**n x random.uniform(0.9, 1.15)` seconds, one log line per retry (ticket id, retry number, wait) written to `outputs/retry_log.txt` (it accumulates all four runs). In a full run over the 156 eligible tickets there were exactly 19 `TransientLLMError`s and all 19 were recovered by the first retry (every retry is retry number 0, and every logged wait lies between 0.045 and 0.0575 seconds; the exact smallest and largest wait differ slightly from run to run because the jitter is random). No ticket ended with a permanent error.
 
 ### Output validation
 
